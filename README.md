@@ -124,7 +124,7 @@ P.S.：这个策略为什么中间会有那么大的一段回撤？你看在2018
   
 ![MA策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
   
-![SABR策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/SABR%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C.png)
+![SABR策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/SABR%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
   
 统计量 | 数值
 ---- | ----
