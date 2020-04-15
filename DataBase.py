@@ -19,6 +19,18 @@ pro = ts.pro_api('da949c80ceb5513dcc45b50ba0b0dec1bc518132101bec0dfb19da56')
 
 #%%
 
+def CalOpDeposit(underlying_pre_close,option_pre_close,option_pre_settle,option_exercise,CorP=1,Point=10000):
+    
+    if CorP:
+        deposit = Point*(option_pre_settle+max(0.12*underlying_pre_close-option_pre_close,0.07*underlying_pre_close))
+    else:
+        deposit = Point*min(option_exercise,option_pre_settle+max(0.12*underlying_pre_close-option_pre_close,0.07*option_exercise))
+    
+    return deposit
+
+
+#%%
+
 def getOpBasic(exchange='SSE',underlying='OP510050.SH',start_date=None,end_date=None):
     
     option_basic = pro.opt_basic(exchange=exchange,fields='ts_code,opt_code,call_put,exercise_price,maturity_date,list_date')
@@ -56,6 +68,9 @@ def getOpDB(option_basic,path):
             t.sleep(60)
         df = pro.opt_daily(ts_code=i,fields='ts_code,trade_date,pre_settle,pre_close,open,high,low,close,settle,vol,amount,oi')
         df['exercise_price'] = option_basic[option_basic['ts_code']==i]['exercise_price'].iloc[0]
+        df['call_put'] = option_basic[option_basic['ts_code']==i]['call_put'].iloc[0]
+        df['maturity_date'] = option_basic[option_basic['ts_code']==i]['maturity_date'].iloc[0]
+        df['list_date'] = option_basic[option_basic['ts_code']==i]['list_date'].iloc[0]
         OpDB = pd.concat([OpDB,df],ignore_index=True,sort=False)
     OpDB.drop_duplicates(['ts_code','trade_date'],inplace=True)
     OpDB.sort_values(by=['ts_code','trade_date'],inplace=True)
@@ -81,6 +96,9 @@ def getOpDB(option_basic,path,start_date=None):
                 t.sleep(60)
             df = pro.opt_daily(ts_code=j,fields='trade_date,pre_settle,pre_close,open,high,low,close,settle,vol,amount,oi')
             df['exercise_price'] = option_basic[option_basic['ts_code']==j]['exercise_price'].iloc[0]
+            df['call_put'] = option_basic[option_basic['ts_code']==i]['call_put'].iloc[0]
+            df['maturity_date'] = option_basic[option_basic['ts_code']==i]['maturity_date'].iloc[0]
+            df['list_date'] = option_basic[option_basic['ts_code']==i]['list_date'].iloc[0]
             df.sort_values(by='trade_date',inplace=True)
             df.reset_index(drop=True,inplace=True)
             df.to_excel(wb,sheet_name=j,index=False)
@@ -90,7 +108,7 @@ def getOpDB(option_basic,path,start_date=None):
 '''
 #%%
 
-def getUnderlying(underlying='510050.SH',start_date='20150223',end_date=None):
+def getUnderlying(underlying='510050.SH',start_date='20150209',end_date=None):
     
     start_date = datetime.datetime.strptime(start_date,'%Y%m%d')
     if end_date is None:
@@ -195,7 +213,20 @@ def getFtDB(future_basic,path,start_date=None):
 '''
 option_basic = getOpBasic()
 getOpDB(option_basic,r"D:\work\back_test_system\DataBase\Option\OP510050.csv")
-underlying = getUnderlying()
+underlying = getUnderlying(end_date='20200410')
 future_basic = getFtBasic()
 getFtDB(future_basic,r"D:\work\back_test_system\DataBase\Future")
+'''
+
+#%%
+'''
+OpDB = pd.read_csv(r'D:\work\back_test_system\DataBase\Option\OP510050.csv')
+OpDB[['trade_date','maturity_date','list_date']] = OpDB[['trade_date','maturity_date','list_date']].applymap(str)
+df = c.deepcopy(underlying[['trade_date','pre_close']])
+df.rename(columns={'pre_close':'underlying_pre_close'},inplace=True)
+OpDB = pd.merge(OpDB,df[['trade_date','underlying_pre_close']],how='left',on='trade_date')
+OpDB['CorP'] = OpDB['call_put'].apply(lambda x: 1 if x=='C' else 0)
+OpDB['deposit'] = OpDB.apply(lambda x: CalOpDeposit(x['underlying_pre_close'],x['pre_close'],x['pre_settle'],x['exercise_price'],x['CorP']),axis=1)
+OpDB.drop(['underlying_pre_close','CorP'],axis=1,inplace=True)
+OpDB.to_csv(r'D:\work\back_test_system\DataBase\Option\OP510050.csv',index=False)
 '''

@@ -12,6 +12,8 @@ import numpy as np
 from scipy.stats import norm
 import pandas as pd
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 #%%
 
@@ -53,7 +55,7 @@ def CalVIX(S0,X,MKT,rf,T,CorP=1):
 
 #%%
 
-def getOpDeposit(depositDf,Point):
+def getOpDeposit(depositDf,Point=10000):
     
     # input:
     # depositDf[DataFrame]: [trade_date, underlying_pre_close, Call_pre_close, Put_pre_close, 
