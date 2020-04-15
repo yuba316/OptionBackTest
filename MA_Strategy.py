@@ -176,3 +176,28 @@ recordDf = BT.OptionBT(signalDf,depositDf)
 benchmarkDf = c.deepcopy(df[['trade_date','close']])
 benchmarkDf['trade_date'] = benchmarkDf['trade_date'].apply(lambda x: datetime.datetime.strptime(x,'%Y%m%d'))
 stat = BT.Visualize(recordDf,benchmarkDf)
+
+#%% 用 BackTest_2 测试
+
+signalDf_2 = c.deepcopy(signalDf)
+signalDf_2['signal'] = signalDf_2['signal'].apply(lambda x: 1 if x==2 else (-1 if x==-2 else 0))
+signalDf_2['price'] = signalDf_2.apply(lambda x: [x['Call_close'],x['Put_close']] if x['direction']==2 else \
+          ([x['Call_close']] if x['direction']==1 else [x['Put_close']]),axis=1)
+signalDf_2['position'] = signalDf_2.apply(lambda x: [1,1] if ((x['direction']==2) and (x['position']==1)) else \
+          ([-1,-1] if ((x['direction']==2) and (x['position']==-1)) else \
+           ([1] if x['position']==1 else ([-1] if x['position']==-1 else \
+            ([0,0] if x['direction']==2 else [0])))),axis=1)
+signalDf_2['pct'] = signalDf_2['direction'].apply(lambda x: [0.1,0.1] if x==2 else [0.1])
+signalDf_2 = pd.merge(signalDf_2,depositDf,how='left',on='trade_date')
+signalDf_2['deposit'] = signalDf_2.apply(lambda x: [x['Call_dep'],x['Put_dep']] if x['direction']==2 else \
+          ([x['Call_dep']] if x['direction']==1 else [x['Put_dep']]),axis=1)
+signalDf_2['direction'] = signalDf_2['direction'].apply(lambda x: [-1,-1] if x==2 else [-1])
+signalDf_2['volume'] = signalDf_2['direction']
+signalDf_2.drop(['Call_close','Put_close','Call_volume','Put_volume','Call_dep','Put_dep'],axis=1,inplace=True)
+
+#%%
+
+import BackTest_2 as BT_2
+
+recordDf_2 = BT_2.OptionBT(signalDf_2)
+stat_2 = BT_2.Visualize(recordDf,benchmarkDf)

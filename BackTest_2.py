@@ -56,7 +56,7 @@ def CalVIX(S0,X,MKT,rf,T,CorP=1):
 def OptionBT(signalDf,Capital=1000000,pct=0.8,Fee=2.5,Rde=0.2,Point=10000):
     
     # input:
-    # signalDf[DataFrame]: [trade_date, signal, price, volume, position, pct]
+    # signalDf[DataFrame]: [trade_date, signal, price, direction, volume, deposit, position, pct]
     # -- signal[int]: -1: 平仓, 0: 不操作, 1: 开仓
     # -- price[list]: 按顺序存储的合约收盘价
     # -- direction[list]: 按顺序存储多空头仓位信息, 1: 多头, -1: 空头, 0: 不操作
