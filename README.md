@@ -7,11 +7,11 @@
   
 <p align="center"><b>MA策略回测结果（用BackTest_2.py回测）</b></p>
 
-![MA策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
+<p align="center">![MA策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)</p>
   
 <p align="center"><b>SABR策略回测结果（用BackTest_2.py回测）</b></p>
 
-![SABR策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/SABR%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
+<p align="center">![SABR策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/SABR%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)</p>
   
 统计量 | 数值
 ---- | ----
@@ -126,7 +126,7 @@ def OptionBT(signalDf,depositDf,Capital=1000000,pct=0.8,Fee=2.5,Rde=0.2,Point=10
   
 <p align="center"><b>MA策略回测结果（用BackTest.py回测）</b></p>
 
-![MA策略回测结果（用BackTest.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT1.png)
+<p align="center">![MA策略回测结果（用BackTest.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT1.png)</p>
   
 统计量 | 数值
 ---- | ----
