@@ -6,9 +6,11 @@
 先复刻了之前那个均线策略，结果和用初版回测函数测出来的结果一样，证明函数逻辑大概率是对的。第二个回测结果是复刻了舍友提到的SABR波动率套利策略，详细的交易规则可以参考第二个链接，除了加了一点点加仓操作（也只是为了测试加仓功能是否有效而已）外，其他思路基本一样……  
   
 <p align="center"><b>MA策略回测结果（用BackTest_2.py回测）</b></p>
+
 ![MA策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
   
 <p align="center"><b>SABR策略回测结果（用BackTest_2.py回测）</b></p>
+
 ![SABR策略回测结果（用BackTest_2.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/SABR%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT2.png)
   
 统计量 | 数值
@@ -123,6 +125,7 @@ def OptionBT(signalDf,depositDf,Capital=1000000,pct=0.8,Fee=2.5,Rde=0.2,Point=10
 >4. 开仓后，每天计算交易期权的隐含波动率（这个大家也可以思考下怎么计算比较快，我用的二分法），若昨日的隐含波动率波幅大于5%，则加仓10%，反之小于-5%，减仓10%（其实这个没啥卵用，我只是想测试一下回测函数的加减仓功能是否正常而已……）
   
 <p align="center"><b>MA策略回测结果（用BackTest.py回测）</b></p>
+
 ![MA策略回测结果（用BackTest.py回测）](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MA%E7%AD%96%E7%95%A5%E5%9B%9E%E6%B5%8B%E7%BB%93%E6%9E%9C_byBT1.png)
   
 统计量 | 数值
