@@ -153,46 +153,25 @@ df['code'] = df.apply(lambda x: getTdOp(x['pre_close'],x['sigma'],OpDB,x['trade_
 #%% 设置买入卖出阈值
 
 df[['sell','buy','delta','dis']] = df['code'].apply(pd.Series)
-signal,n,flag = [],len(df),True
-for i in range(n):
-    if flag:
-        if df['dis'].iloc[i]>0.05:
-            signal.append(1)
-            flag = False
-            dis = df['dis'].iloc[i]
-            dis_cp = df['dis'].iloc[i]
-            sell = df['sell'].iloc[i]
-            buy = df['buy'].iloc[i]
-        else:
-            signal.append(0)
+signal,dis,sell,buy,n = [1],df['dis'].iloc[0],df['sell'].iloc[0],df['buy'].iloc[0],len(df)
+for i in range(1,n,1):
+    if (df['sell'].iloc[i]!=sell)and(df['buy'].iloc[i]!=buy):
+        signal.append(2)
+        dis = df['dis'].iloc[i]
+        sell = df['sell'].iloc[i]
+        buy = df['buy'].iloc[i]
+    elif df['dis'].iloc[i]>dis:
+        signal.append(3) # 加仓
+        dis = df['dis'].iloc[i]
     else:
-        if (df['sell'].iloc[i]!=sell)or(df['buy'].iloc[i]!=buy):
-            signal.append(-1)
-            flag = True
-            if df['dis'].iloc[i]>0.05:
-                signal[-1] = 2
-                flag = False
-        elif df['dis'].iloc[i]<dis:
-            if df['dis'].iloc[i]<0.03:
-                signal.append(-1)
-                flag = True
-            elif (dis_cp-df['dis'].iloc[i])/dis_cp>=0.5:
-                signal.append(4) # 减仓
-                dis_cp = df['dis'].iloc[i]
-            else:
-                signal.append(0)
-        elif df['dis'].iloc[i]>dis:
-                signal.append(3) # 加仓
-                dis = df['dis'].iloc[i]
-        else:
-            signal.append(0)
+        signal.append(0)
 df['signal'] = signal
 df.iloc[-1,-1] = -1
 
 #%% 按回测函数的要求生成信号表
 
 trade_date,signal,code,direction,volume,position,pct = [df['trade_date'].iloc[0]],[df['signal'].iloc[0]],[],[],[],[[0,0]],[[0,0]]
-if signal[-1]==1:
+if signal[0]==1:
     code.append([df['sell'].iloc[0],df['buy'].iloc[0]])
     direction.append([-1,1])
     volume.append([int(100*df['delta'].iloc[0]),100])
@@ -266,14 +245,9 @@ signalDf['trade_date'] = signalDf['trade_date'].apply(lambda x: datetime.datetim
 
 #%% 回测
 
-signalDf = signalDf.iloc[9:,:]
-signalDf.reset_index(drop=True,inplace=True)
 recordDf = BT.OptionBT(signalDf)
-
-#%% 可视化
-
 benchmarkDf = c.deepcopy(df[['trade_date','close']])
 benchmarkDf['trade_date'] = benchmarkDf['trade_date'].apply(lambda x: datetime.datetime.strptime(x,'%Y%m%d'))
 benchmarkDf = benchmarkDf[(benchmarkDf['trade_date']>recordDf['trade_date'].iloc[0])&(benchmarkDf['trade_date']<=recordDf['trade_date'].iloc[-1])]
 benchmarkDf.reset_index(drop=True,inplace=True)
-Stat = BT.Visualize(recordDf,benchmarkDf)
+stat = BT.Visualize(recordDf,benchmarkDf)
