@@ -33,10 +33,19 @@ def CalSabr(F,K,T,arg,alpha,beta):
     
     return a/b*z/X
 
+def optMSE(VIX,F,K,T,arg,alpha,beta):
+    
+    n,MSE = len(VIX),0
+    for i in range(n):
+        Sabr = CalSabr(F,K[i],T,arg,alpha,beta)
+        MSE = MSE+(VIX[i]-Sabr)**2
+    
+    return MSE/n
+
 def fun(args):
     
     VIX,F,K,T,alpha,beta = args
-    v = lambda x: abs(VIX-CalSabr(F,K,T,x,alpha,beta))
+    v = lambda x: optMSE(VIX,F,K,T,x,alpha,beta)
     
     return v
 
@@ -65,7 +74,7 @@ def CalDelta(S0,X,sigma,rf,T,CorP=1):
 
 #%% 寻找每日可开仓的期权合约
 
-df = DB.getUnderlying(start_date='20160410',end_date='20200410')[['trade_date','close','pre_close']]
+df = DB.getUnderlying(end_date='20190101')[['trade_date','close','pre_close']]
 df.dropna(inplace=True)
 df.reset_index(drop=True,inplace=True)
 rfDf = DB.getRf(df['trade_date'].iloc[0],df['trade_date'].iloc[-1])
@@ -99,14 +108,15 @@ def getTdAlpha(pre_close,OpDB,td,maturity_date,rf):
 df['alpha'] = df.apply(lambda x: getTdAlpha(x['pre_close'],OpDB,x['trade_date'],x['maturity_date'],x['rf']),axis=1)
 df['alpha'] = df['alpha'].apply(lambda x: np.nan if x<10e-6 else x)
 df['alpha'].fillna(method='ffill',inplace=True)
-
+df['beta'] = 0
+'''
 from pyfinance.ols import PandasRollingOLS
 df['lnA'],df['lnf'] = np.log(df['alpha']),np.log(df['pre_close'])
 df['beta'] = PandasRollingOLS(df['lnA'],df['lnf'],21).beta+1
 df.drop(['lnA','lnf'],axis=1,inplace=True)
 df.dropna(inplace=True)
 df.reset_index(drop=True,inplace=True)
-
+'''
 #%% 自己定义今天想要什么样的期权
 
 def getTdOp(pre_close,OpDB,td,maturity_date,rf,alpha,beta):
@@ -129,17 +139,17 @@ def getTdOp(pre_close,OpDB,td,maturity_date,rf,alpha,beta):
     n = len(df)
     if n==0:
         return []
-    arg = []
+    VIX,K = list(df['VIX']),list(df['exercise_price'])
     x0 = np.asarray((0.5,0.5))
     arg_1 = (-1,1,0,1)
     cons = con(arg_1)
-    for i in range(n):
-        VIX,F,K,T,alpha,beta = df['VIX'].iloc[i],df['underlying_pre_close'].iloc[i],df['exercise_price'].iloc[i],df['T'].iloc[i],df['alpha'].iloc[i],df['beta'].iloc[i]
-        arg_0 = (VIX,F,K,T,alpha,beta)
-        res = minimize(fun(arg_0),x0,method='SLSQP',constraints=cons)
-        arg.append(res.x)
+    arg_0 = (VIX,pre_close,K,T,alpha,beta)
+    res = minimize(fun(arg_0),x0,method='SLSQP',constraints=cons)
+    arg = res.x
+    arg = arg[np.newaxis,:]
+    arg = arg.repeat(n, axis=0)
     
-    df['arg'] = arg
+    df['arg'] = list(arg)
     df['SABR'] = df.apply(lambda x: CalSabr(x['underlying_pre_close'],x['exercise_price'],x['T'],x['arg'],x['alpha'],x['beta']),axis=1)
     df['dis'] = df['VIX']-df['SABR']
     df.dropna(inplace=True)
@@ -176,6 +186,7 @@ df['code'] = df.apply(lambda x: getTdOp(x['pre_close'],OpDB,x['trade_date'],x['m
 #%% 设置买入卖出阈值
 
 df[['sell','buy','delta','dis']] = df['code'].apply(pd.Series)
+df.fillna(method='ffill',inplace=True)
 signal,dis,sell,buy,n = [1],df['dis'].iloc[0],df['sell'].iloc[0],df['buy'].iloc[0],len(df)
 for i in range(1,n,1):
     if (df['sell'].iloc[i]!=sell)and(df['buy'].iloc[i]!=buy):

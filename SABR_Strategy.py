@@ -153,6 +153,7 @@ df['code'] = df.apply(lambda x: getTdOp(x['pre_close'],x['sigma'],OpDB,x['trade_
 #%% 设置买入卖出阈值
 
 df[['sell','buy','delta','dis']] = df['code'].apply(pd.Series)
+df.fillna(method='ffill',inplace=True)
 signal,dis,sell,buy,n = [1],df['dis'].iloc[0],df['sell'].iloc[0],df['buy'].iloc[0],len(df)
 for i in range(1,n,1):
     if (df['sell'].iloc[i]!=sell)and(df['buy'].iloc[i]!=buy):
