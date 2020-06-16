@@ -209,6 +209,30 @@ def getFtDB(future_basic,path,start_date=None):
     
     return
 
+#%%
+
+def getSkDB(path,start_date='20070101'):
+    
+    if not os.path.exists(path):
+        trade_date = pro.trade_cal(exchange='',start_date=start_date,fields='cal_date,is_open')
+        trade_date = list(trade_date[trade_date['is_open']==1]['cal_date'])
+        stock_quote = pro.daily(trade_date=trade_date[0])
+    else:
+        stock_quote = pd.read_csv(path)
+        stock_quote['trade_date'].apply(str)
+        trade_date = pro.trade_cal(exchange='',start_date=stock_quote['trade_date'].iloc[-1],fields='cal_date,is_open')
+        trade_date = list(trade_date[trade_date['is_open']==1]['cal_date'])
+    
+    for i in trade_date[1:]:
+        df = pro.daily(trade_date=i)
+        stock_quote = pd.concat([stock_quote,df],ignore_index=True,sort=False)
+    
+    stock_quote.sort_values(by=['trade_date','ts_code'],inplace=True)
+    stock_quote.reset_index(drop=True,inplace=True)
+    stock_quote.to_csv(path,index=False)
+    
+    return
+
 #%% 上次更新：20200410
 '''
 option_basic = getOpBasic()
@@ -230,3 +254,7 @@ OpDB['deposit'] = OpDB.apply(lambda x: CalOpDeposit(x['underlying_pre_close'],x[
 OpDB.drop(['underlying_pre_close','CorP'],axis=1,inplace=True)
 OpDB.to_csv(r'D:\work\back_test_system\DataBase\Option\OP510050.csv',index=False)
 '''
+
+#%% 上次更新：20200525
+
+# getSkDB(r"D:\work\back_test_system\DataBase\Stock\Stock.csv")
