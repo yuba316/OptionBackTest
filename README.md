@@ -19,6 +19,7 @@ __默顿跳跃-扩散混合模型（MDJ）股票模拟轨道__
 ![MDJ股票轨道](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MDJ%E5%B8%A6%E6%B3%8A%E6%9D%BE%E8%B7%B3%E8%BF%87%E7%A8%8B%E7%9A%84%E8%82%A1%E7%A5%A8%E8%BD%A8%E9%81%93.png)
   
 __收益率分布__
+  
 ![MDJ核密度估计](https://github.com/yuba316/OptionBackTest/blob/master/%E5%9B%BE%E7%89%87/MDJ_%E6%A0%B8.png)
   
 ### 方差-Gamma模型（VG）
